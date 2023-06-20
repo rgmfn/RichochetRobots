@@ -1,5 +1,14 @@
 import pygame
 
+iota_ctr = 0
+def iota(reset=False):
+    global iota_ctr
+    iota_ctr += 1
+    if reset:
+        iota_ctr = 0
+
+    return iota_ctr
+
 spritesheet = pygame.image.load('assets/MRMOTEXT EX.png')
 SPRITES_PER_ROW = 32
 
@@ -26,6 +35,7 @@ COLOR_BLUE = (0, 0, 255)
 COLOR_YELLOW = (255, 255, 0)
 COLOR_GRAY = (100, 100, 100)
 COLOR_WHITE = (255, 255, 255)
+COLOR_PINK = (255, 0, 255)
 
 sprites = {}
 for ch in range(ord('a'), ord('z')+1):
@@ -56,16 +66,51 @@ sprites['.'] = spritesheet.subsurface((
     TILE_WIDTH,
     TILE_HEIGHT,
 ))
-# [.|] has space on the left
-sprites['|'] = spritesheet.subsurface((
-    (529 % SPRITES_PER_ROW) * TILE_WIDTH,
-    (529 // SPRITES_PER_ROW) * TILE_HEIGHT,
+sprites['left'] = spritesheet.subsurface((
+    (57 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (57 // SPRITES_PER_ROW) * TILE_HEIGHT,
     TILE_WIDTH,
     TILE_HEIGHT,
 ))
-sprites['_'] = spritesheet.subsurface((
-    (561 % SPRITES_PER_ROW) * TILE_WIDTH,
-    (561 // SPRITES_PER_ROW) * TILE_HEIGHT,
+sprites['right'] = spritesheet.subsurface((
+    (59 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (59 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['top'] = spritesheet.subsurface((
+    (26 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (26 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['bottom'] = spritesheet.subsurface((
+    (90 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (90 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['top left'] = spritesheet.subsurface((
+    (530 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (530 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['top right'] = spritesheet.subsurface((
+    (531 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (531 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['bottom left'] = spritesheet.subsurface((
+    (562 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (562 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['bottom right'] = spritesheet.subsurface((
+    (563 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (563 // SPRITES_PER_ROW) * TILE_HEIGHT,
     TILE_WIDTH,
     TILE_HEIGHT,
 ))
@@ -84,6 +129,7 @@ COLORS = [
     COLOR_YELLOW,
     COLOR_BLACK,
     COLOR_WHITE,
+    COLOR_PINK,
 ]
 COLOR_SURFS = {}
 for color in COLORS:

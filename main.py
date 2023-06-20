@@ -1,5 +1,6 @@
 import pygame
 import data.constants as dc
+import data.map as dm
 
 pygame.init()
 
@@ -13,20 +14,31 @@ screen = pygame.Surface((
 ))
 pygame.display.set_caption('Richochet Robots')
 
-# gear A
-# star B
-# moon C
-# planet D
-# (ix, iy): (symb_color, symb_symbol)
-board_symbols = {
-    (2, 1): (dc.COLOR_GREEN, 'a'),
-    (1, 6): (dc.COLOR_YELLOW, 'b'),
-    (1, 9): (dc.COLOR_GREEN, 'b'),
-    (2, 14): (dc.COLOR_YELLOW, 'c'),
-    (4, 10): (dc.COLOR_RED, 'd'),
-    (5, 6): (dc.COLOR_BLUE, 'd')
-}
+YELLOW = dc.iota()
+GREEN = dc.iota()
+RED = dc.iota()
+BLUE = dc.iota()
+GRAY = dc.iota()
 
+robot_pos = {
+    YELLOW: [1, 1],
+    GREEN: [3, 3],
+    RED: [5, 5],
+    BLUE: [7, 7],
+    GRAY: [10, 10],
+}
+ROBOT_COLORS = {
+    YELLOW: dc.COLOR_YELLOW,
+    GREEN: dc.COLOR_GREEN,
+    RED: dc.COLOR_RED,
+    BLUE: dc.COLOR_BLUE,
+    GRAY: dc.COLOR_GRAY,
+}
+sel_robot: int = -1
+
+# dests {(iy, ix): (dest_color, dest_symbol)}
+# walls [(iy, ix): wall_symbol]
+dests, walls = dm.load_map('map.txt')
 mainClock = pygame.time.Clock()
 
 def label(surf: pygame.Surface, symb: str, fg: tuple = None, bg: tuple = None):
@@ -55,16 +67,42 @@ while run:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 run = False
+            elif event.key == pygame.K_1:
+                sel_robot = YELLOW
+            elif event.key == pygame.K_2:
+                sel_robot = GREEN
+            elif event.key == pygame.K_3:
+                sel_robot = RED
+            elif event.key == pygame.K_4:
+                sel_robot = BLUE
+            elif event.key == pygame.K_5:
+                sel_robot = GRAY
+            elif event.key == pygame.K_UP:
+                move_up()
+            elif event.key == pygame.K_DOWN:
+                move_down()
+            elif event.key == pygame.K_LEFT:
+                move_left()
+            elif event.key == pygame.K_RIGHT:
+                move_right()
     
     screen.fill(dc.COLOR_BLACK)
 
     for iy in range(dc.TILES_WIDE):
         for ix in range(dc.TILES_TALL):
-            if (iy, ix) in board_symbols.keys():
-                color, symb = board_symbols[(iy, ix)]
+            for robot_num in range(1, 5+1):
+                if (iy, ix) == robot_pos[robot_num]:
+                    label(surf=screen, symb=str(robot_num), fg=ROBOT_COLORS[robot_num])
+                    continue
+
+            if (iy, ix) in dests.keys():
+                color, symb = dests[(iy, ix)]
                 label(surf=screen, symb=symb, fg=dc.COLOR_BLACK, bg=color)
-            # elif:
             else:
+                if (iy, ix) in walls.keys():
+                    symb = walls[(iy, ix)]
+                    label(surf=screen, symb=symb)
+
                 label(surf=screen, symb='.')
 
     pygame.transform.scale(
