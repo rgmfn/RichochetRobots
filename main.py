@@ -26,7 +26,7 @@ robot_pos = {
     YELLOW: (1, 1),
     GREEN: (3, 3),
     RED: (5, 5),
-    BLUE: (7, 7),
+    BLUE: (12, 12),
     GRAY: (10, 10),
 }
 ROBOT_COLORS = {
@@ -63,11 +63,13 @@ def move(dx: int = 0, dy: int = 0):
                 is_moving = False
             elif dy == 1 and walls[next_pos] == 'top':
                 is_moving = False
-        if not (0 <= curr_pos[0] + dy < 16):
+        if not 0 <= next_pos[0] < 16:
             is_moving = False
-        elif not (0 <= curr_pos[1] + dx < 16):
+        elif not 0 <= next_pos[1] < 16:
             is_moving = False
         if next_pos in robot_pos.values():
+            is_moving = False
+        if 7 <= next_pos[0] <= 8 and 7 <= next_pos[1] <= 8:
             is_moving = False
 
         if is_moving:
@@ -133,6 +135,10 @@ while run:
 
     for iy in range(dc.TILES_WIDE):
         for ix in range(dc.TILES_TALL):
+            if 7 <= iy <= 8 and 7 <= ix <= 8:
+                label(surf=screen, symb='a', fg=dc.COLOR_BLACK)
+                continue
+
             drew_robot = False
             for robot_num in range(1, 5+1):
                 if (iy, ix) == robot_pos[robot_num]:
