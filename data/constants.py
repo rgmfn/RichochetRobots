@@ -54,6 +54,12 @@ for ch in range(ord('0'), ord('9')+1):
         TILE_WIDTH,
         TILE_HEIGHT,
     ))
+sprites['dot'] = spritesheet.subsurface((
+    (439 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (439 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
 sprites['.'] = spritesheet.subsurface((
     (878 % SPRITES_PER_ROW) * TILE_WIDTH,
     (878 // SPRITES_PER_ROW) * TILE_HEIGHT,
