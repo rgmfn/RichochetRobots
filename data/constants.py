@@ -20,8 +20,10 @@ SCALE = 6
 TILES_WIDE = 16
 TILES_TALL = 16
 
+HUD_TILES_TALL = 2
+
 SCREEN_WIDTH = TILE_WIDTH * TILES_WIDE
-SCREEN_HEIGHT = TILE_HEIGHT * TILES_TALL
+SCREEN_HEIGHT = TILE_HEIGHT * (TILES_TALL+HUD_TILES_TALL)
 
 DISPLAY_WIDTH = SCREEN_WIDTH * SCALE
 DISPLAY_HEIGHT = SCREEN_HEIGHT * SCALE
@@ -29,13 +31,21 @@ DISPLAY_HEIGHT = SCREEN_HEIGHT * SCALE
 FPS = 30
 
 COLOR_BLACK = (0, 0, 0)
-COLOR_RED = (255, 0, 0)
-COLOR_GREEN = (0, 255, 0)
-COLOR_BLUE = (0, 0, 255)
-COLOR_YELLOW = (255, 255, 0)
+COLOR_BG = (43, 51, 57)
+COLOR_RED = (230, 126, 128)
+COLOR_GREEN = (167, 192, 128)
+COLOR_BLUE = (127, 187, 179)
+COLOR_YELLOW = (219, 188, 127)
+COLOR_FG = (211, 198, 170)
+COLOR_PINK = (214, 153, 182)
+# COLOR_RED = (255, 0, 0)
+# COLOR_GREEN = (0, 255, 0)
+# COLOR_BLUE = (0, 0, 255)
+# COLOR_YELLOW = (255, 255, 0)
 COLOR_GRAY = (100, 100, 100)
-COLOR_WHITE = (255, 255, 255)
-COLOR_PINK = (255, 0, 255)
+COLOR_LGRAY = (50, 50, 50)
+# COLOR_WHITE = (255, 255, 255)
+# COLOR_PINK = (255, 0, 255)
 
 sprites = {}
 for ch in range(ord('a'), ord('z')+1):
@@ -69,6 +79,12 @@ sprites['.'] = spritesheet.subsurface((
 sprites['.'] = spritesheet.subsurface((
     (878 % SPRITES_PER_ROW) * TILE_WIDTH,
     (878 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['square'] = spritesheet.subsurface((
+    (58 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (58 // SPRITES_PER_ROW) * TILE_HEIGHT,
     TILE_WIDTH,
     TILE_HEIGHT,
 ))
@@ -120,6 +136,30 @@ sprites['bottom right'] = spritesheet.subsurface((
     TILE_WIDTH,
     TILE_HEIGHT,
 ))
+sprites['spade'] = spritesheet.subsurface((
+    (748 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (748 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['diamond'] = spritesheet.subsurface((
+    (749 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (749 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['club'] = spritesheet.subsurface((
+    (750 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (750 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
+sprites['heart'] = spritesheet.subsurface((
+    (751 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (751 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
 for sprite in sprites.values():
     sprite.set_colorkey(COLOR_BLACK)
 
@@ -134,11 +174,18 @@ COLORS = [
     COLOR_RED,
     COLOR_YELLOW,
     COLOR_BLACK,
-    COLOR_WHITE,
+    COLOR_FG,
     COLOR_PINK,
+    COLOR_LGRAY,
 ]
 COLOR_SURFS = {}
 for color in COLORS:
     surf = base_surface.copy()
     surf.fill(color)
     COLOR_SURFS[color] = surf
+
+YELLOW = iota()
+GREEN = iota()
+RED = iota()
+BLUE = iota()
+GRAY = iota()

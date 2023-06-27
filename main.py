@@ -15,31 +15,37 @@ screen = pygame.Surface((
 ))
 pygame.display.set_caption('Richochet Robots')
 
-YELLOW = dc.iota()
-GREEN = dc.iota()
-RED = dc.iota()
-BLUE = dc.iota()
-GRAY = dc.iota()
+MVT_KEYS = {
+    pygame.K_UP: (0, -1),
+    pygame.K_w: (0, -1),
+    pygame.K_DOWN: (0, 1),
+    pygame.K_s: (0, 1),
+    pygame.K_LEFT: (-1, 0),
+    pygame.K_a: (-1, 0),
+    pygame.K_RIGHT: (1, 0),
+    pygame.K_d: (1, 0),
+}
 
 # robot_pos: {[y, x]}
 robot_pos = {
-    YELLOW: (1, 1),
-    GREEN: (3, 3),
-    RED: (5, 5),
-    BLUE: (12, 12),
-    GRAY: (10, 10),
+    dc.YELLOW: (1, 1),
+    dc.GREEN: (3, 3),
+    dc.RED: (5, 5),
+    dc.BLUE: (12, 12),
+    dc.GRAY: (10, 10),
 }
 ROBOT_COLORS = {
-    YELLOW: dc.COLOR_YELLOW,
-    GREEN: dc.COLOR_GREEN,
-    RED: dc.COLOR_RED,
-    BLUE: dc.COLOR_BLUE,
-    GRAY: dc.COLOR_GRAY,
+    dc.YELLOW: dc.COLOR_YELLOW,
+    dc.GREEN: dc.COLOR_GREEN,
+    dc.RED: dc.COLOR_RED,
+    dc.BLUE: dc.COLOR_BLUE,
+    dc.GRAY: dc.COLOR_GRAY,
 }
 sel_robot: int = -1
 
 def move(dx: int = 0, dy: int = 0):
     global robot_pos, sel_robot
+    init_pos = robot_pos[sel_robot]
     is_moving: bool = True
 
     while is_moving:
@@ -79,12 +85,30 @@ def move(dx: int = 0, dy: int = 0):
             )
             # print(robot_pos[sel_robot])
 
+    if init_pos == robot_pos[sel_robot]:
+        return 0
+    else:
+        return 1
+
 # dests {(iy, ix): (dest_color, dest_symbol)}
 # walls [(iy, ix): wall_symbol]
 dests, walls = dm.load_map('map.txt')
+possible_dests: list = list(dests.keys())
+exit = random.choice(list(dests.keys()))
+possible_dests.remove(exit)
+
 mainClock = pygame.time.Clock()
 
-def label(surf: pygame.Surface, symb: str, fg: tuple = None, bg: tuple = None):
+def label(surf: pygame.Surface, pos: tuple, symb: str = None, word: str = None, fg: tuple = None, bg: tuple = None):
+    """
+        pos: (y, x)
+    """
+    if word is not None:
+        for i, s in enumerate(word):
+            label(surf=surf, pos=(pos[0], pos[1]+i), symb=word[i], fg=fg, bg=bg)
+        return
+
+    iy, ix = pos
     if bg is not None:
         screen.blit(dc.COLOR_SURFS[bg], (
             # symb[0]: symbol color
@@ -101,7 +125,7 @@ def label(surf: pygame.Surface, symb: str, fg: tuple = None, bg: tuple = None):
         iy * dc.TILE_HEIGHT,
     ))
 
-print(random.choice(list(dests.values())))
+moves = 0
 
 run = True
 while run:
@@ -113,54 +137,62 @@ while run:
             if event.key == pygame.K_ESCAPE:
                 run = False
             elif event.key == pygame.K_1:
-                sel_robot = YELLOW
+                sel_robot = dc.YELLOW
             elif event.key == pygame.K_2:
-                sel_robot = GREEN
+                sel_robot = dc.GREEN
             elif event.key == pygame.K_3:
-                sel_robot = RED
+                sel_robot = dc.RED
             elif event.key == pygame.K_4:
-                sel_robot = BLUE
+                sel_robot = dc.BLUE
             elif event.key == pygame.K_5:
-                sel_robot = GRAY
-            elif event.key == pygame.K_UP:
-                move(dy=-1)
-            elif event.key == pygame.K_DOWN:
-                move(dy=1)
-            elif event.key == pygame.K_LEFT:
-                move(dx=-1)
-            elif event.key == pygame.K_RIGHT:
-                move(dx=1)
+                sel_robot = dc.GRAY
+            elif event.key in MVT_KEYS:
+                moves += move(dx=MVT_KEYS[event.key][0], dy=MVT_KEYS[event.key][1])
+
+            if robot_pos[dests[exit][0]] == exit:
+                # TODO pull out into method?
+                # go to next turn
+                if len(possible_dests) > 0:
+                    exit = random.choice(possible_dests)
+                    possible_dests.remove(exit)
+                    moves = 0
+                else:
+                    run = False
     
     screen.fill(dc.COLOR_BLACK)
 
     for iy in range(dc.TILES_WIDE):
         for ix in range(dc.TILES_TALL):
             if 7 <= iy <= 8 and 7 <= ix <= 8:
-                label(surf=screen, symb='a', fg=dc.COLOR_BLACK)
+                label(surf=screen, pos=(iy, ix), symb='a', fg=dc.COLOR_BLACK)
                 continue
 
             drew_robot = False
             for robot_num in range(1, 5+1):
                 if (iy, ix) == robot_pos[robot_num]:
                     bg = dc.COLOR_PINK if sel_robot == robot_num else None
-                    label(surf=screen, symb=str(robot_num), fg=ROBOT_COLORS[robot_num], bg=bg)
+                    label(surf=screen, pos=(iy, ix), symb=str(robot_num), fg=ROBOT_COLORS[robot_num], bg=bg)
                     drew_robot = True
 
             if drew_robot:
                 if (iy, ix) in walls.keys():
                     symb = walls[(iy, ix)]
-                    label(surf=screen, symb=symb)
+                    label(surf=screen, pos=(iy, ix), symb=symb)
                 continue
 
             if (iy, ix) in dests.keys():
                 color, symb = dests[(iy, ix)]
-                label(surf=screen, symb=symb, fg=dc.COLOR_BLACK, bg=color)
+                label(surf=screen, pos=(iy, ix), symb=symb, fg=dc.COLOR_BLACK, bg=ROBOT_COLORS[color])
             else:
+                label(surf=screen, pos=(iy, ix), symb='square', fg=dc.COLOR_LGRAY)
+
                 if (iy, ix) in walls.keys():
                     symb = walls[(iy, ix)]
-                    label(surf=screen, symb=symb)
+                    label(surf=screen, pos=(iy, ix), symb=symb)
 
-                label(surf=screen, symb='dot')
+    label(surf=screen, pos=(dc.TILES_TALL+dc.HUD_TILES_TALL-1, 0), symb=dests[exit][1], fg=dc.COLOR_BLACK, bg=ROBOT_COLORS[dests[exit][0]])
+
+    label(surf=screen, pos=(dc.TILES_TALL+dc.HUD_TILES_TALL-1, 2), word=str(moves), fg=dc.COLOR_FG)
 
     pygame.transform.scale(
         screen,
