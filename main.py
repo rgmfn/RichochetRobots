@@ -43,7 +43,7 @@ ROBOT_COLORS = {
 }
 sel_robot: int = -1
 
-def move(dx: int = 0, dy: int = 0):
+def move(dx: int = 0, dy: int = 0) -> int:
     global robot_pos, sel_robot
     init_pos = robot_pos[sel_robot]
     is_moving: bool = True
@@ -125,7 +125,7 @@ def label(surf: pygame.Surface, pos: tuple, symb: str = None, word: str = None, 
         iy * dc.TILE_HEIGHT,
     ))
 
-moves = 0
+prev_moves: list = []
 
 run = True
 while run:
@@ -146,16 +146,23 @@ while run:
                 sel_robot = dc.BLUE if sel_robot != dc.BLUE else None
             elif event.key == pygame.K_5:
                 sel_robot = dc.GRAY if sel_robot != dc.GRAY else None
-            elif event.key in MVT_KEYS:
-                moves += move(dx=MVT_KEYS[event.key][0], dy=MVT_KEYS[event.key][1])
+            elif event.key == pygame.K_u:
+                if len(prev_moves) > 0:
+                    robot_num, pos = prev_moves.pop(-1)
+                    robot_pos[robot_num] = pos
+                    sel_robot = robot_num
+            elif event.key in MVT_KEYS and sel_robot is not None:
+                this_move = (sel_robot, robot_pos[sel_robot])
+                if move(dx=MVT_KEYS[event.key][0], dy=MVT_KEYS[event.key][1]):
+                    prev_moves.append(this_move)
 
             if robot_pos[dests[exit][0]] == exit:
-                # TODO pull out into method?
+                # FIXME pull out into method?
                 # go to next turn
                 if len(possible_dests) > 0:
                     exit = random.choice(possible_dests)
                     possible_dests.remove(exit)
-                    moves = 0
+                    prev_moves = []
                 else:
                     run = False
     
@@ -195,7 +202,7 @@ while run:
 
     label(surf=screen, pos=(dc.TILES_TALL+dc.HUD_TILES_TALL-1, 0), symb=dests[exit][1], fg=dc.COLOR_BLACK, bg=ROBOT_COLORS[dests[exit][0]])
 
-    label(surf=screen, pos=(dc.TILES_TALL+dc.HUD_TILES_TALL-1, 2), word=str(moves), fg=dc.COLOR_FG)
+    label(surf=screen, pos=(dc.TILES_TALL+dc.HUD_TILES_TALL-1, 2), word=str(len(prev_moves)), fg=dc.COLOR_FG)
 
     pygame.transform.scale(
         screen,
