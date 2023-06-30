@@ -160,6 +160,12 @@ sprites['heart'] = spritesheet.subsurface((
     TILE_WIDTH,
     TILE_HEIGHT,
 ))
+sprites['robot'] = spritesheet.subsurface((
+    (811 % SPRITES_PER_ROW) * TILE_WIDTH,
+    (811 // SPRITES_PER_ROW) * TILE_HEIGHT,
+    TILE_WIDTH,
+    TILE_HEIGHT,
+))
 for sprite in sprites.values():
     sprite.set_colorkey(COLOR_BLACK)
 

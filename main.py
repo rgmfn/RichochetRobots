@@ -137,15 +137,15 @@ while run:
             if event.key == pygame.K_ESCAPE:
                 run = False
             elif event.key == pygame.K_1:
-                sel_robot = dc.YELLOW
+                sel_robot = dc.YELLOW if sel_robot != dc.YELLOW else None
             elif event.key == pygame.K_2:
-                sel_robot = dc.GREEN
+                sel_robot = dc.GREEN if sel_robot != dc.GREEN else None
             elif event.key == pygame.K_3:
-                sel_robot = dc.RED
+                sel_robot = dc.RED if sel_robot != dc.RED else None
             elif event.key == pygame.K_4:
-                sel_robot = dc.BLUE
+                sel_robot = dc.BLUE if sel_robot != dc.BLUE else None
             elif event.key == pygame.K_5:
-                sel_robot = dc.GRAY
+                sel_robot = dc.GRAY if sel_robot != dc.GRAY else None
             elif event.key in MVT_KEYS:
                 moves += move(dx=MVT_KEYS[event.key][0], dy=MVT_KEYS[event.key][1])
 
@@ -170,8 +170,11 @@ while run:
             drew_robot = False
             for robot_num in range(1, 5+1):
                 if (iy, ix) == robot_pos[robot_num]:
-                    bg = dc.COLOR_PINK if sel_robot == robot_num else None
-                    label(surf=screen, pos=(iy, ix), symb=str(robot_num), fg=ROBOT_COLORS[robot_num], bg=bg)
+                    # bg = dc.COLOR_PINK if sel_robot == robot_num else None
+                    fg = ROBOT_COLORS[robot_num] if sel_robot != robot_num else dc.COLOR_BLACK
+                    bg = None if sel_robot != robot_num else ROBOT_COLORS[robot_num]
+                    label(surf=screen, pos=(iy, ix), symb=str(robot_num), fg=fg, bg=bg) # draws numbers
+                    # label(surf=screen, pos=(iy, ix), symb='robot', fg=fg, bg=bg) # draws robots
                     drew_robot = True
 
             if drew_robot:
